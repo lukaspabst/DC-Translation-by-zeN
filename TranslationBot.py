@@ -1,4 +1,4 @@
-import os
+#import os
 import discord
 import openai
 from dotenv import load_dotenv
@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+# Coded by zeN
 
 class TranslationBot(discord.Client):
 
@@ -134,3 +135,4 @@ class TranslationBot(discord.Client):
 
 client = TranslationBot()
 client.run(os.getenv('DISCORD_TOKEN'))
+
