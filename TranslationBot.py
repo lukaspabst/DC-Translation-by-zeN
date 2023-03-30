@@ -113,7 +113,7 @@ class TranslationBot(discord.Client):
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
-        api_key=os.getenv['OPENAI_API_KEY'])
+        api_key=os.getenv('OPENAI_API_KEY'))
 
       if response.choices[0].text.strip() == "":
         raise Exception("Translation failed")
@@ -133,4 +133,4 @@ class TranslationBot(discord.Client):
 
 
 client = TranslationBot()
-client.run(os.getenv['DISCORD_TOKEN'])
+client.run(os.getenv('DISCORD_TOKEN'))
