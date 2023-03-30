@@ -91,7 +91,7 @@ class TranslationBot(discord.Client):
     # Create a Discord embed with the gradient as the border color
     embed = discord.Embed(
       title=f'**Author:** {message.author.name}',
-      description==
+      description=
       f'\n\n**Original Message:**\n{content[:20]}{"..." if len(content) > 20 else ""}\n\n**Translation:**\n{translated_content}\n\n',
       color=discord.Color.from_rgb(26, 188, 156))
 
