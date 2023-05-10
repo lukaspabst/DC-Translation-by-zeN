@@ -1,6 +1,7 @@
-#import os
 import discord
 import openai
+import requests
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,52 +16,52 @@ class TranslationBot(discord.Client):
     intents.reactions = True
     super().__init__(intents=intents, *args, **kwargs)
     self.reaction_flags = {
-      '🇺🇸': 'English',
-      '🇨🇳': 'Mandarin Chinese',
-      '🇭🇰': 'Cantonese',
-      '🇪🇸': 'Spanish',
-      '🇧🇩': 'Bengali',
-      '🇳🇬': 'Nigerian Pidgin',
-      '🇵🇰': 'Punjabi',
-      '🇷🇺': 'Russian',
-      '🇯🇵': 'Japanese',
-      '🇩🇪': 'German',
-      '🇺🇦': 'Ukrainian',
-      '🇹🇷': 'Turkish',
-      '🇫🇷': 'French',
-      '🇮🇹': 'Italian',
-      '🇵🇭': 'Tagalog',
-      '🇻🇳': 'Vietnamese',
-      '🇰🇷': 'Korean',
-      '🇵🇱': 'Polish',
-      '🇷🇴': 'Romanian',
-      '🇳🇵': 'Nepali',
-      '🇲🇲': 'Burmese',
-      '🇳🇱': 'Dutch',
-      '🇸🇦': 'Arabic',
-      '🇫🇮': 'Finnish',
-      '🇨🇦': 'French Canadian',
-      '🇨🇿': 'Czech',
-      '🇲🇳': 'Mongolian',
-      '🇬🇧': 'British English',
-      '🇳🇴': 'Norwegian',
-      '🇸🇪': 'Swedish',
-      '🇺🇾': 'Urdu',
-      '🇮🇷': 'Persian',
-      '🇬🇷': 'Greek',
-      '🇨🇭': 'Swiss German',
-      '🇦🇪': 'Arabic (UAE)',
-      '🇧🇷': 'Portuguese',
-      '🇩🇿': 'Arabic (Algeria)',
-      '🇮🇳': 'Hindi',
-      '🇵🇹': 'European Portuguese',
-      '🇭🇷': 'Croatian',
-      '🇮🇪': 'Irish',
-      '🇩🇰': 'Danish',
-      '🇱🇰': 'Sinhalese',
-      '🇸🇰': 'Slovak',
-      '🇸🇮': 'Slovenian',
-      '🇧🇪': 'Flemish',
+      '🇺🇸': 'en',
+      '🇨🇳': 'zh-cn',
+      '🇭🇰': 'zh-hk',
+      '🇪🇸': 'es',
+      '🇧🇩': 'bn',
+      '🇳🇬': 'pcm',
+      '🇵🇰': 'pa',
+      '🇷🇺': 'ru',
+      '🇯🇵': 'ja',
+      '🇩🇪': 'de',
+      '🇺🇦': 'uk',
+      '🇹🇷': 'tr',
+      '🇫🇷': 'fr',
+      '🇮🇹': 'it',
+      '🇵🇭': 'tl',
+      '🇻🇳': 'vi',
+      '🇰🇷': 'ko',
+      '🇵🇱': 'pl',
+      '🇷🇴': 'ro',
+      '🇳🇵': 'ne',
+      '🇲🇲': 'my',
+      '🇳🇱': 'nl',
+      '🇸🇦': 'ar',
+      '🇫🇮': 'fi',
+      '🇨🇦': 'fr-ca',
+      '🇨🇿': 'cs',
+      '🇲🇳': 'mn',
+      '🇬🇧': 'en-gb',
+      '🇳🇴': 'no',
+      '🇸🇪': 'sv',
+      '🇺🇾': 'ur',
+      '🇮🇷': 'fa',
+      '🇬🇷': 'el',
+      '🇨🇭': 'de-ch',
+      '🇦🇪': 'ar-ae',
+      '🇧🇷': 'pt',
+      '🇩🇿': 'ar-dz',
+      '🇮🇳': 'hi',
+      '🇵🇹': 'pt-pt',
+      '🇭🇷': 'hr',
+      '🇮🇪': 'ga',
+      '🇩🇰': 'da',
+      '🇱🇰': 'si',
+      '🇸🇰': 'sk',
+      '🇸🇮': 'sl',
+      '🇧🇪': 'nl-be'
     }
 
   async def on_ready(self):
@@ -106,20 +107,16 @@ class TranslationBot(discord.Client):
   def translate(self, text, target_language):
 
     try:
-      response = openai.Completion.create(
-        model="text-davinci-001",
-        prompt=f"Translate this text into {target_language}: {text}",
-        temperature=0.5,
-        max_tokens=1024,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        api_key=os.getenv('OPENAI_API_KEY'))
-
-      if response.choices[0].text.strip() == "":
-        raise Exception("Translation failed")
-
-      translation = response.choices[0].text.strip()
+      endpoint = "https://translate.googleapis.com/translate_a/single"
+      params = {
+          "client": "gtx",
+          "sl": "auto",
+          "tl": target_language,
+          "dt": "t",
+          "q": text
+      }
+      response = requests.get(endpoint, params=params)
+      translation = response.json()[0][0][0]
 
       # remove leading special characters and whitespace
       while translation and (translation[0].isspace()
@@ -135,4 +132,3 @@ class TranslationBot(discord.Client):
 
 client = TranslationBot()
 client.run(os.getenv('DISCORD_TOKEN'))
-
